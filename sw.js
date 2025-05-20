@@ -1,4 +1,4 @@
-const CACHE_NAME = 'marubatsu-cache-v1.0.1';  // バージョン管理
+const CACHE_NAME = 'marubatsu-cache-v1.0.0';  // バージョン管理
 const FILES_TO_CACHE = [
   '/',
   '/index.html',
