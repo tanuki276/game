@@ -277,6 +277,20 @@
       .then(() => console.log('Service Worker登録成功'))
       .catch(err => console.error('Service Worker登録失敗:', err));
     }
+// 購読してサーバーに送る
+navigator.serviceWorker.ready.then(swReg => {
+  swReg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: 'N-VO0eCqdzuvQhVPcYKs9ncvdQrhmGV8yamNl9iCbhQ'
+  }).then(subscription => {
+    // ここでsubscriptionをPythonサーバーにPOSTする
+    fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(subscription)
+    });
+  });
+});
   </script>
 </body>
 </html>
