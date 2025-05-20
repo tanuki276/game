@@ -79,7 +79,7 @@
   </style>
 </head>
 <body>
-  <h1>クソ強AI マルバツゲーム</h1>
+  <h1>マルバツゲーム</h1>
   <div class="board" id="board"></div>
   <p id="status">あなたの番！（X）</p>
   <button id="reset" onclick="resetGame()">リセット</button>
@@ -119,7 +119,7 @@
         const best = getBestMove();
         board[best] = ai;
         render();
-        if (checkWinner(board, ai)) return endGame("AIの勝ち！強すぎ！");
+        if (checkWinner(board, ai)) return endGame("AIの勝ち！");
         if (board.every(v => v)) return endGame("引き分け！");
         statusEl.textContent = "あなたの番！（X）";
       }, 300);
