@@ -1,425 +1,281 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>マルバツゲーム</title>
-<style>
-  :root {
-    --bg-light: #fefefe;
-    --bg-dark: #222;
-    --text-light: #222;
-    --text-dark: #eee;
-    --border-light: #aaa;
-    --border-dark: #555;
-    --primary-light: #0080ff;
-    --primary-dark: #3399ff;
-  }
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: var(--bg-light);
-    color: var(--text-light);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-    user-select: none;
-  }
-  body.dark {
-    background-color: var(--bg-dark);
-    color: var(--text-dark);
-  }
-  #game {
-    display: grid;
-    grid-template-columns: repeat(3, 80px);
-    grid-template-rows: repeat(3, 80px);
-    gap: 8px;
-    margin: 20px 0;
-  }
-  .cell {
-    background-color: var(--bg-light);
-    border: 2px solid var(--border-light);
-    border-radius: 8px;
-    font-size: 48px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: background-color 0.3s, border-color 0.3s;
-  }
-  body.dark .cell {
-    background-color: var(--bg-dark);
-    border-color: var(--border-dark);
-  }
-  .cell:disabled {
-    cursor: default;
-    opacity: 0.7;
-  }
-  #status {
-    font-size: 1.2em;
-    margin-bottom: 10px;
-  }
-  #streak {
-    font-size: 1em;
-    margin-bottom: 10px;
-  }
-  #settingsBtn {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    background: none;
-    border: none;
-    font-size: 28px;
-    cursor: pointer;
-    color: inherit;
-    z-index: 100;
-  }
-  #settingsPanel {
-    position: fixed;
-    top: 0;
-    right: -300px;
-    width: 280px;
-    height: 100vh;
-    background-color: var(--bg-light);
-    color: var(--text-light);
-    box-shadow: -2px 0 6px rgba(0,0,0,0.3);
-    padding: 20px;
-    box-sizing: border-box;
-    transition: right 0.3s;
-    display: flex;
-    flex-direction: column;
-  }
-  body.dark #settingsPanel {
-    background-color: var(--bg-dark);
-    color: var(--text-dark);
-  }
-  #settingsPanel.open {
-    right: 0;
-  }
-  #settingsPanel label {
-    margin-top: 12px;
-    margin-bottom: 6px;
-    font-weight: bold;
-  }
-  #settingsPanel select, #settingsPanel input[type=range] {
-    width: 100%;
-    padding: 6px;
-    border-radius: 4px;
-    border: 1px solid var(--border-light);
-    background-color: var(--bg-light);
-    color: var(--text-light);
-  }
-  body.dark #settingsPanel select, body.dark #settingsPanel input[type=range] {
-    background-color: var(--bg-dark);
-    border-color: var(--border-dark);
-    color: var(--text-dark);
-  }
-  #resetStreakBtn {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: var(--primary-light);
-    border: none;
-    color: white;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  #resetStreakBtn:hover {
-    background-color: var(--primary-dark);
-  }
-  #themeSelect {
-    width: 100%;
-  }
-  #bgmControl {
-    margin-top: 12px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>三目並べ改</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      transition: background 0.3s, color 0.3s;
+    }
+    :root {
+      --bg: #ffffff;
+      --fg: #000000;
+      --grid-border: #000000;
+    }
+    .dark {
+      --bg: #111111;
+      --fg: #eeeeee;
+      --grid-border: #eeeeee;
+    }
+    #game {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 4px;
+      justify-content: center;
+      margin-top: 50px;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: transparent;
+      border: 2px solid var(--grid-border);
+      font-size: 64px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .cell.x { color: #d32f2f; }
+    .cell.o { color: #1976d2; }
+    #menu-button {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      width: 40px;
+      height: 40px;
+      background: var(--fg);
+      color: var(--bg);
+      font-size: 24px;
+      border: none;
+      border-radius: 4px;
+    }
+    #settings {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: var(--bg);
+      color: var(--fg);
+      width: 250px;
+      height: 100%;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+      z-index: 10;
+    }
+    #settings.show {
+      transform: translateX(0);
+    }
+    label, select, input {
+      display: block;
+      margin-bottom: 10px;
+    }
+    #status {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+    #record {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+  </style>
 </head>
 <body>
-<button id="settingsBtn" aria-label="設定メニュー">&#9776;</button>
-<div id="settingsPanel" aria-hidden="true" role="region" aria-label="設定">
-  <label for="brightnessRange">明るさ</label>
-  <input type="range" id="brightnessRange" min="50" max="150" value="100" aria-valuemin="50" aria-valuemax="150" aria-valuenow="100" />
-  <label for="volumeRange">音量</label>
-  <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="0.5" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.5" />
-  <label for="themeSelect">テーマ</label>
-  <select id="themeSelect" aria-label="テーマ選択">
-    <option value="light">ライト</option>
-    <option value="dark">ダーク</option>
-    <option value="system">システム</option>
-  </select>
-  <label for="difficultySelect">強さ</label>
-  <select id="difficultySelect" aria-label="強さ選択">
-    <option value="1">よわい（ランダム）</option>
-    <option value="3" selected>ふつう</option>
-    <option value="9">つよい（不可能に近い）</option>
-  </select>
-  <button id="resetStreakBtn">連勝記録リセット</button>
-</div>
-<div id="status" role="status" aria-live="polite">あなたの番です。</div>
-<div id="streak">連勝記録: 0</div>
-<div id="game" role="grid" aria-label="三目並びゲーム盤">
-  <button class="cell" role="gridcell" aria-label="空きマス" data-index="0"></button>
-  <button class="cell" role="gridcell" aria-label="空きマス" data-index="1"></button>
-  <button class="cell" role="gridcell" aria-label="空きマス" data-index="2"></button>
-  <button class="cell" role="gridcell" aria-label="空きマス" data-index="3"></button>
-  <button class="cell" role="gridcell" aria-label="空きマス" data-index="4"></button>
-  <button class="cell" role="gridcell" aria-label="空きマス" data-index="5"></button>
-  <button class="cell" role="gridcell" aria-label="空きマス" data-index="6"></button>
-  <button class="cell" role="gridcell" aria-label="空きマス" data-index="7"></button>
-  <button class="cell" role="gridcell" aria-label="空きマス" data-index="8"></button>
-</div>
-<audio id="bgm" loop src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5bb876765d.mp3?filename=retro-game-arcade-loop-11099.mp3" preload="auto"></audio>
-<script>
-  const game = document.getElementById('game');
-  const cells = [...game.querySelectorAll('.cell')];
-  const status = document.getElementById('status');
-  const streakDisplay = document.getElementById('streak');
-  const settingsBtn = document.getElementById('settingsBtn');
-  const settingsPanel = document.getElementById('settingsPanel');
-  const brightnessRange = document.getElementById('brightnessRange');
-  const volumeRange = document.getElementById('volumeRange');
-  const themeSelect = document.getElementById('themeSelect');
-  const difficultySelect = document.getElementById('difficultySelect');
-  const resetStreakBtn = document.getElementById('resetStreakBtn');
-  const bgm = document.getElementById('bgm');
-  let boardState = Array(9).fill(null);
-  let currentPlayer = 'X';
-  let gameActive = true;
-  let streakCount = 0;
+  <button id="menu-button">☰</button>
+  <div id="settings">
+    <label>テーマ
+      <select id="theme">
+        <option value="system">システム</option>
+        <option value="light">ライト</option>
+        <option value="dark">ダーク</option>
+      </select>
+    </label>
+    <label>明るさ
+      <input type="range" id="brightness" min="50" max="150" value="100">
+    </label>
+    <label>音量
+      <input type="range" id="volume" min="0" max="100" value="50">
+    </label>
+    <label>強さ
+      <select id="difficulty">
+        <option value="0">よわい</option>
+        <option value="3">ふつう</option>
+        <option value="9">つよい</option>
+      </select>
+    </label>
+    <button onclick="resetGame()">リセット</button>
+  </div>
+  <div id="game"></div>
+  <div id="status"></div>
+  <div id="record"></div>
+  <audio id="bgm" loop>
+    <source src="https://vgmsite.com/soundtracks/tetris-gameboy/jtazkvmn/01%20Type%20A.mp3" type="audio/mp3">
+  </audio>
 
-  function updateCell(index) {
-    const cell = cells[index];
-    cell.textContent = boardState[index] === 'X' ? '✕' : boardState[index] === 'O' ? '◯' : '';
-    cell.setAttribute('aria-label', boardState[index] ? (boardState[index] === 'X' ? '✕マス' : '◯マス') : '空きマス');
-    cell.disabled = !!boardState[index] || !gameActive;
-  }
+  <script>
+    const cells = [];
+    let board = Array(9).fill("");
+    let player = "x";
+    let ai = "o";
+    let playing = true;
+    let winStreak = parseInt(localStorage.getItem("winStreak") || "0");
+    const game = document.getElementById("game");
+    const status = document.getElementById("status");
+    const record = document.getElementById("record");
+    const bgm = document.getElementById("bgm");
 
-  function checkWin(player) {
-    const wins = [
-      [0,1,2],[3,4,5],[6,7,8],
-      [0,3,6],[1,4,7],[2,5,8],
-      [0,4,8],[2,4,6]
-    ];
-    return wins.some(line => line.every(i => boardState[i] === player));
-  }
+    const themeSelect = document.getElementById("theme");
+    const brightnessSlider = document.getElementById("brightness");
+    const volumeSlider = document.getElementById("volume");
+    const diffSelect = document.getElementById("difficulty");
 
-  function disableAllCells() {
-    cells.forEach(c => c.disabled = true);
-  }
+    function createBoard() {
+      game.innerHTML = "";
+      for (let i = 0; i < 9; i++) {
+        const div = document.createElement("div");
+        div.className = "cell";
+        div.addEventListener("click", () => playerMove(i));
+        game.appendChild(div);
+        cells[i] = div;
+      }
+    }
 
-  function enableEmptyCells() {
-    cells.forEach((c,i) => {
-      c.disabled = boardState[i] !== null || !gameActive;
-    });
-  }
+    function updateCell(i) {
+      cells[i].textContent = board[i] === "x" ? "✕" : board[i] === "o" ? "◯" : "";
+      cells[i].classList.toggle("x", board[i] === "x");
+      cells[i].classList.toggle("o", board[i] === "o");
+    }
 
-  function saveStreak() {
-    localStorage.setItem('ticTacToeStreak', streakCount);
-  }
+    function checkWin(b, p) {
+      const lines = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return lines.some(line => line.every(i => b[i] === p));
+    }
 
-  function loadStreak() {
-    const saved = localStorage.getItem('ticTacToeStreak');
-    streakCount = saved ? Number(saved) : 0;
-    updateStreak();
-  }
+    function emptyCells(b) {
+      return b.map((v,i)=>v===""?i:null).filter(v=>v!==null);
+    }
 
-  function updateStreak() {
-    streakDisplay.textContent = `連勝記録: ${streakCount}`;
-  }
-
-  function resetGame() {
-    boardState.fill(null);
-    gameActive = true;
-    currentPlayer = 'X';
-    status.textContent = 'あなたの番です。';
-    cells.forEach((c,i) => {
-      c.textContent = '';
-      c.disabled = false;
-      c.setAttribute('aria-label', '空きマス');
-    });
-    enableEmptyCells();
-  }
-
-  function minimax(board, depth, isMaximizing) {
-    const winner = getWinner(board);
-    if(winner === 'O') return 10 - depth;
-    if(winner === 'X') return depth - 10;
-    if(board.every(v => v !== null)) return 0;
-    if(depth === 0) return 0;
-
-    if(isMaximizing) {
+    function botMove() {
+      const level = parseInt(diffSelect.value);
+      let best = null;
       let bestScore = -Infinity;
-      for(let i=0; i<9; i++) {
-        if(board[i] === null) {
-          board[i] = 'O';
-          const score = minimax(board, depth -1, false);
-          board[i] = null;
-          bestScore = Math.max(score, bestScore);
+      emptyCells(board).forEach(i => {
+        board[i] = ai;
+        let score = minimax(board, 0, false, level);
+        board[i] = "";
+        if (score > bestScore) {
+          bestScore = score;
+          best = i;
+        }
+      });
+      if (best !== null) {
+        board[best] = ai;
+        updateCell(best);
+        if (checkWin(board, ai)) {
+          status.textContent = "負けた！";
+          playing = false;
+          winStreak = 0;
+          localStorage.setItem("winStreak", "0");
+        } else if (emptyCells(board).length === 0) {
+          status.textContent = "引き分け！";
+          playing = false;
         }
       }
-      return bestScore;
-    } else {
-      let bestScore = Infinity;
-      for(let i=0; i<9; i++) {
-        if(board[i] === null) {
-          board[i] = 'X';
-          const score = minimax(board, depth -1, true);
-          board[i] = null;
-          bestScore = Math.min(score, bestScore);
+    }
+
+    function minimax(b, depth, isMax, maxDepth) {
+      if (checkWin(b, ai)) return 10 - depth;
+      if (checkWin(b, player)) return depth - 10;
+      if (emptyCells(b).length === 0 || depth >= maxDepth) return 0;
+      if (isMax) {
+        let best = -Infinity;
+        for (let i of emptyCells(b)) {
+          b[i] = ai;
+          best = Math.max(best, minimax(b, depth + 1, false, maxDepth));
+          b[i] = "";
         }
-      }
-      return bestScore;
-    }
-  }
-
-  function getWinner(board) {
-    const lines = [
-      [0,1,2],[3,4,5],[6,7,8],
-      [0,3,6],[1,4,7],[2,5,8],
-      [0,4,8],[2,4,6]
-    ];
-    for(const [a,b,c] of lines) {
-      if(board[a] && board[a] === board[b] && board[a] === board[c]) {
-        return board[a];
-      }
-    }
-    return null;
-  }
-
-  function aiMove() {
-    if(!gameActive) return;
-    const depthLimit = Number(difficultySelect.value);
-    if(depthLimit === 1) {
-      const emptyIndices = boardState.map((v,i) => v === null ? i : null).filter(i => i !== null);
-      if(emptyIndices.length === 0) return;
-      const choice = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-      boardState[choice] = 'O';
-      updateCell(choice);
-    } else {
-      let bestScore = -Infinity;
-      let bestMove = null;
-      for(let i=0; i<9; i++) {
-        if(boardState[i] === null) {
-          boardState[i] = 'O';
-          const score = minimax(boardState, depthLimit, false);
-          boardState[i] = null;
-          if(score > bestScore) {
-            bestScore = score;
-            bestMove = i;
-          }
+        return best;
+      } else {
+        let best = Infinity;
+        for (let i of emptyCells(b)) {
+          b[i] = player;
+          best = Math.min(best, minimax(b, depth + 1, true, maxDepth));
+          b[i] = "";
         }
-      }
-      if(bestMove !== null) {
-        boardState[bestMove] = 'O';
-        updateCell(bestMove);
+        return best;
       }
     }
 
-    if(checkWin('O')) {
-      gameActive = false;
-      status.textContent = 'AIの勝利です。';
-      streakCount = 0;
-      updateStreak();
-      saveStreak();
-      disableAllCells();
-      return;
+    function playerMove(i) {
+      if (!playing || board[i]) return;
+      board[i] = player;
+      updateCell(i);
+      if (checkWin(board, player)) {
+        status.textContent = "勝ち！";
+        winStreak++;
+        localStorage.setItem("winStreak", winStreak.toString());
+        playing = false;
+        return;
+      } else if (emptyCells(board).length === 0) {
+        status.textContent = "引き分け！";
+        playing = false;
+        return;
+      }
+      setTimeout(() => botMove(), 300);
     }
-    if(boardState.every(v => v !== null)) {
-      gameActive = false;
-      status.textContent = '引き分けです。';
-      streakCount = 0;
-      updateStreak();
-      saveStreak();
-      return;
-    }
-    currentPlayer = 'X';
-    status.textContent = 'あなたの番です。';
-    enableEmptyCells();
-  }
 
-  function playerMove(index) {
-    if(!gameActive || boardState[index] !== null) return;
-    if(currentPlayer !== 'X') return;
-    boardState[index] = 'X';
-    updateCell(index);
-    if(checkWin('X')) {
-      gameActive = false;
-      status.textContent = 'あなたの勝利です！';
-      streakCount++;
-      updateStreak();
-      saveStreak();
-      disableAllCells();
-      return;
+    function resetGame() {
+      board = Array(9).fill("");
+      playing = true;
+      status.textContent = "";
+      createBoard();
     }
-    if(boardState.every(v => v !== null)) {
-      gameActive = false;
-      status.textContent = '引き分けです。';
-      streakCount = 0;
-      updateStreak();
-      saveStreak();
-      return;
-    }
-    currentPlayer = 'O';
-    status.textContent = 'AIの番です。';
-    disableAllCells();
-    setTimeout(aiMove, 500);
-  }
 
-  cells.forEach(cell => {
-    cell.addEventListener('click', () => {
-      const idx = Number(cell.dataset.index);
-      playerMove(idx);
+    document.getElementById("menu-button").addEventListener("click", () => {
+      document.getElementById("settings").classList.toggle("show");
     });
-  });
 
-  settingsBtn.addEventListener('click', () => {
-    const open = settingsPanel.classList.toggle('open');
-    settingsPanel.setAttribute('aria-hidden', !open);
-  });
+    themeSelect.addEventListener("change", applyTheme);
+    brightnessSlider.addEventListener("input", () => {
+      document.body.style.filter = `brightness(${brightnessSlider.value}%)`;
+    });
+    volumeSlider.addEventListener("input", () => {
+      bgm.volume = volumeSlider.value / 100;
+    });
 
-  brightnessRange.addEventListener('input', () => {
-    const val = brightnessRange.value;
-    document.body.style.filter = `brightness(${val}%)`;
-  });
-
-  volumeRange.addEventListener('input', () => {
-    bgm.volume = volumeRange.value;
-  });
-
-  themeSelect.addEventListener('change', () => {
-    const val = themeSelect.value;
-    if(val === 'light') {
-      document.body.classList.remove('dark');
-    } else if(val === 'dark') {
-      document.body.classList.add('dark');
-    } else if(val === 'system') {
-      const darkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if(darkScheme) document.body.classList.add('dark');
-      else document.body.classList.remove('dark');
+    function applyTheme() {
+      const theme = themeSelect.value;
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else if (theme === "light") {
+        document.documentElement.classList.remove("dark");
+      } else {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle("dark", isDark);
+      }
     }
-  });
 
-  resetStreakBtn.addEventListener('click', () => {
-    streakCount = 0;
-    updateStreak();
-    saveStreak();
-  });
-
-  function init() {
-    loadStreak();
-    brightnessRange.value = 100;
-    volumeRange.value = 0.5;
-    bgm.volume = 0.5;
-    themeSelect.value = 'system';
-    themeSelect.dispatchEvent(new Event('change'));
-    bgm.play().catch(() => {});
-    resetGame();
-  }
-
-  init();
-</script>
+    window.addEventListener("DOMContentLoaded", () => {
+      createBoard();
+      applyTheme();
+      document.body.style.filter = `brightness(${brightnessSlider.value}%)`;
+      bgm.volume = volumeSlider.value / 100;
+      bgm.play().catch(() => {});
+      record.textContent = `連勝: ${winStreak}`;
+    });
+  </script>
 </body>
 </html>
