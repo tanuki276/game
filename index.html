@@ -5,288 +5,276 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>マルバツゲーム</title>
 <style>
-  :root[data-theme="light"] {
-    --bg: #fff;
-    --text: #000;
-    --btn-bg: #eee;
-    --btn-hover-bg: #ddd;
+  * {
+    box-sizing: border-box;
   }
-  :root[data-theme="dark"] {
-    --bg: #222;
-    --text: #eee;
-    --btn-bg: #444;
-    --btn-hover-bg: #555;
-  }
-  :root {
-    --bg: #fff;
-    --text: #000;
-    --btn-bg: #eee;
-    --btn-hover-bg: #ddd;
-  }
-  html, body {
-    margin: 0; padding: 0;
+  body {
+    margin:0; padding:0;
+    font-family: "Yu Gothic", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg);
     color: var(--text);
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    transition: background-color 0.5s, color 0.5s;
-    filter: brightness(100%);
-    user-select: none;
-    height: 100vh;
-    overflow-x: hidden;
+    transition: background-color 0.3s, color 0.3s;
+    user-select:none;
+  }
+  :root {
+    --bg: #121212;
+    --text: #eee;
+    --board-bg: #222;
+    --cell-bg: #333;
+    --cell-border: #555;
+    --highlight: #ffb74d;
+    --button-bg: #444;
+    --button-hover-bg: #666;
+  }
+  body.light {
+    --bg: #fdfdfd;
+    --text: #222;
+    --board-bg: #eee;
+    --cell-bg: #fff;
+    --cell-border: #bbb;
+    --highlight: #ffa726;
+    --button-bg: #ddd;
+    --button-hover-bg: #ccc;
+  }
+  body.system {
+    color-scheme: dark light;
+  }
+  @media (prefers-color-scheme: light) {
+    body.system {
+      --bg: #fdfdfd;
+      --text: #222;
+      --board-bg: #eee;
+      --cell-bg: #fff;
+      --cell-border: #bbb;
+      --highlight: #ffa726;
+      --button-bg: #ddd;
+      --button-hover-bg: #ccc;
+    }
+  }
+  @media (prefers-color-scheme: dark) {
+    body.system {
+      --bg: #121212;
+      --text: #eee;
+      --board-bg: #222;
+      --cell-bg: #333;
+      --cell-border: #555;
+      --highlight: #ffb74d;
+      --button-bg: #444;
+      --button-hover-bg: #666;
+    }
+  }
+  header {
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    padding: 0.5em 1em;
+    background-color: var(--board-bg);
+    border-bottom: 2px solid var(--highlight);
+  }
+  h1 {
+    margin:0;
+    font-weight: 700;
+    font-size: 1.5rem;
   }
   #menuToggle {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    width: 30px;
-    height: 22px;
+    position: relative;
+    width: 35px;
+    height: 30px;
     cursor: pointer;
-    z-index: 10001;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 1001;
+  }
+  #menuToggle input {
+    display: block;
+    width: 35px;
+    height: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1002;
   }
   #menuToggle span {
     display: block;
     height: 4px;
-    background-color: var(--text);
+    width: 100%;
+    background: var(--text);
     border-radius: 2px;
-    transition: 0.3s;
+    position: absolute;
+    left: 0;
+    transition: all 0.3s ease;
   }
-  #menuToggle.open span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
+  #menuToggle span:nth-child(1) {
+    top: 0;
   }
-  #menuToggle.open span:nth-child(2) {
+  #menuToggle span:nth-child(2) {
+    top: 13px;
+  }
+  #menuToggle span:nth-child(3) {
+    top: 26px;
+  }
+  #menuToggle input:checked ~ span:nth-child(1) {
+    transform: rotate(45deg);
+    top: 13px;
+  }
+  #menuToggle input:checked ~ span:nth-child(2) {
     opacity: 0;
   }
-  #menuToggle.open span:nth-child(3) {
-    transform: rotate(-45deg) translate(6px, -6px);
+  #menuToggle input:checked ~ span:nth-child(3) {
+    transform: rotate(-45deg);
+    top: 13px;
   }
   #settingsPanel {
     position: fixed;
-    top: 0;
-    right: -320px;
-    width: 300px;
-    height: 100vh;
-    background-color: var(--btn-bg);
-    box-shadow: -2px 0 8px rgba(0,0,0,0.3);
-    padding: 20px;
-    transition: right 0.4s ease;
-    z-index: 10000;
-    color: var(--text);
-    overflow-y: auto;
+    top: 50px;
+    right: 10px;
+    background: var(--board-bg);
+    border: 2px solid var(--highlight);
+    border-radius: 8px;
+    padding: 1em;
+    width: 240px;
+    box-shadow: 0 0 10px var(--highlight);
+    z-index: 1000;
+    display: none;
   }
-  #settingsPanel.open {
-    right: 0;
+  #menuToggle input:checked ~ #settingsPanel {
+    display: block;
   }
   #settingsPanel h2 {
     margin-top: 0;
-    margin-bottom: 1rem;
-    font-weight: 700;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--highlight);
+    padding-bottom: 0.3em;
   }
   #settingsPanel label {
-    display: block;
-    margin-bottom: 15px;
-    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.6em 0;
   }
-  #settingsPanel input[type="range"],
-  #settingsPanel select {
-    width: 100%;
-    padding: 6px;
-    border-radius: 4px;
-    border: 1px solid #888;
-    font-size: 1rem;
-    background-color: var(--bg);
-    color: var(--text);
+  #settingsPanel select,
+  #settingsPanel input[type="checkbox"] {
+    cursor: pointer;
   }
   #settingsPanel button {
-    background-color: var(--btn-bg);
-    border: 1px solid #999;
+    margin-top: 1em;
+    width: 100%;
+    padding: 0.6em;
+    background: var(--button-bg);
+    border: none;
+    border-radius: 6px;
     color: var(--text);
-    padding: 10px;
     font-weight: 700;
     cursor: pointer;
-    width: 100%;
-    margin-top: 20px;
-    border-radius: 6px;
-    transition: background-color 0.3s;
+    transition: background-color 0.2s ease;
   }
   #settingsPanel button:hover {
-    background-color: var(--btn-hover-bg);
+    background: var(--button-hover-bg);
   }
-  #game {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
+  main {
+    max-width: 360px;
+    margin: 2em auto;
+    padding: 0 1em;
+    text-align: center;
   }
   #board {
     display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: repeat(3, 100px);
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+    background-color: var(--board-bg);
+    padding: 6px;
+    border-radius: 10px;
+    user-select:none;
   }
   .cell {
-    background-color: var(--btn-bg);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-color: var(--cell-bg);
+    border: 2.5px solid var(--cell-border);
+    border-radius: 8px;
     font-size: 3rem;
+    font-weight: 700;
+    color: var(--highlight);
+    display:flex;
+    justify-content:center;
+    align-items:center;
     cursor: pointer;
-    user-select: none;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, border-color 0.3s;
   }
   .cell:hover {
-    background-color: var(--btn-hover-bg);
+    background-color: var(--highlight);
+    color: var(--bg);
+  }
+  .cell.disabled {
+    cursor: default;
+    color: var(--cell-border);
   }
   #status {
-    margin-top: 20px;
-    font-weight: 700;
+    margin-top: 1em;
     font-size: 1.2rem;
+    min-height: 1.5em;
+  }
+  #streakDisplay {
+    margin-top: 0.8em;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--highlight);
+  }
+  button#resetGameBtn {
+    margin-top: 1em;
+    background: var(--highlight);
+    border:none;
+    border-radius: 8px;
+    color: var(--bg);
+    padding: 0.6em 1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button#resetGameBtn:hover {
+    background: #ff9800;
   }
 </style>
 </head>
-<body>
-<div id="menuToggle" aria-label="設定メニュー開閉" role="button" tabindex="0">
-  <span></span><span></span><span></span>
-</div>
-<div id="settingsPanel" aria-hidden="true">
-  <h2>設定</h2>
-  <label for="brightnessRange">明るさ</label>
-  <input id="brightnessRange" type="range" min="50" max="150" value="100" />
-  <label for="volumeRange">音量</label>
-  <input id="volumeRange" type="range" min="0" max="100" value="50" />
-  <label for="themeSelect">テーマ</label>
-  <select id="themeSelect">
-    <option value="system">システム</option>
-    <option value="light">ライト</option>
-    <option value="dark">ダーク</option>
-  </select>
-</div>
-<div id="game">
-  <div id="board" aria-label="ゲーム盤" role="grid">
-    <div class="cell" role="gridcell" data-index="0"></div>
-    <div class="cell" role="gridcell" data-index="1"></div>
-    <div class="cell" role="gridcell" data-index="2"></div>
-    <div class="cell" role="gridcell" data-index="3"></div>
-    <div class="cell" role="gridcell" data-index="4"></div>
-    <div class="cell" role="gridcell" data-index="5"></div>
-    <div class="cell" role="gridcell" data-index="6"></div>
-    <div class="cell" role="gridcell" data-index="7"></div>
-    <div class="cell" role="gridcell" data-index="8"></div>
+<body class="system">
+<header>
+  <h1>マルバツゲーム</h1>
+  <div id="menuToggle">
+    <input type="checkbox" id="menuCheckbox" />
+    <span></span>
+    <span></span>
+    <span></span>
+    <div id="settingsPanel" role="region" aria-label="設定メニュー" tabindex="0">
+      <h2>設定</h2>
+      <label for="themeSelect">テーマ
+        <select id="themeSelect" aria-label="テーマ選択">
+          <option value="light">ライト</option>
+          <option value="dark" selected>ダーク</option>
+          <option value="system">システム</option>
+        </select>
+      </label>
+      <label for="bgmToggle">BGM
+        <input type="checkbox" id="bgmToggle" checked aria-label="BGMオンオフ"/>
+      </label>
+      <div id="streakDisplay" aria-live="polite">連勝記録: 0 連勝</div>
+      <button id="resetGameBtn" aria-label="ゲームリセット">ゲームリセット</button>
+    </div>
   </div>
-  <div id="status" aria-live="polite"></div>
-</div>
-<audio id="bgm" loop src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_3d73542c10.mp3?filename=8-bit-background-music-2631.mp3"></audio>
+</header>
+<main>
+  <div id="board" role="grid" aria-label="三目並べゲーム盤">
+    <div class="cell" role="gridcell" aria-label="位置 1" data-index="0" tabindex="0"></div>
+    <div class="cell" role="gridcell" aria-label="位置 2" data-index="1" tabindex="0"></div>
+    <div class="cell" role="gridcell" aria-label="位置 3" data-index="2" tabindex="0"></div>
+    <div class="cell" role="gridcell" aria-label="位置 4" data-index="3" tabindex="0"></div>
+    <div class="cell" role="gridcell" aria-label="位置 5" data-index="4" tabindex="0"></div>
+    <div class="cell" role="gridcell" aria-label="位置 6" data-index="5" tabindex="0"></div>
+    <div class="cell" role="gridcell" aria-label="位置 7" data-index="6" tabindex="0"></div>
+    <div class="cell" role="gridcell" aria-label="位置 8" data-index="7" tabindex="0"></div>
+    <div class="cell" role="gridcell" aria-label="位置 9" data-index="8" tabindex="0"></div>
+  </div>
+  <div id="status" aria-live="polite" aria-atomic="true"></div>
+</main>
 <script>
-  const html = document.documentElement;
-  const menuToggle = document.getElementById('menuToggle');
-  const settingsPanel = document.getElementById('settingsPanel');
-  const brightnessRange = document.getElementById('brightnessRange');
-  const volumeRange = document.getElementById('volumeRange');
-  const themeSelect = document.getElementById('themeSelect');
-  const bgm = document.getElementById('bgm');
-  const cells = document.querySelectorAll('.cell');
-  const status = document.getElementById('status');
-
-  let board = Array(9).fill(null);
-  let turn = 'X';
-  let gameOver = false;
-
-  function checkWin(player) {
-    const lines = [
-      [0,1,2],[3,4,5],[6,7,8],
-      [0,3,6],[1,4,7],[2,5,8],
-      [0,4,8],[2,4,6]
-    ];
-    return lines.some(line => line.every(i => board[i] === player));
-  }
-  function checkDraw() {
-    return board.every(cell => cell !== null);
-  }
-  function updateStatus() {
-    if(gameOver){
-      if(checkWin('X')) status.textContent = "Xの勝利！";
-      else if(checkWin('O')) status.textContent = "Oの勝利！";
-      else status.textContent = "引き分け";
-    } else {
-      status.textContent = turn + "の番";
-    }
-  }
-  function resetGame(){
-    board.fill(null);
-    cells.forEach(c => c.textContent = '');
-    turn = 'X';
-    gameOver = false;
-    updateStatus();
-  }
-  function playMove(i){
-    if(gameOver||board[i]!==null)return;
-    board[i] = turn;
-    cells[i].textContent = turn;
-    if(checkWin(turn)){
-      gameOver = true;
-    } else if(checkDraw()){
-      gameOver = true;
-    } else {
-      turn = turn === 'X' ? 'O' : 'X';
-    }
-    updateStatus();
-  }
-  cells.forEach(c=>{
-    c.addEventListener('click', () => {
-      playMove(Number(c.dataset.index));
-    });
-  });
-
-  menuToggle.addEventListener('click', () => {
-    const open = settingsPanel.classList.toggle('open');
-    menuToggle.classList.toggle('open', open);
-    settingsPanel.setAttribute('aria-hidden', !open);
-  });
-
-  brightnessRange.addEventListener('input', () => {
-    const val = brightnessRange.value;
-    html.style.filter = `brightness(${val}%)`;
-  });
-
-  volumeRange.addEventListener('input', () => {
-    bgm.volume = volumeRange.value / 100;
-  });
-
-  function applyTheme(t){
-    if(t==='system'){
-      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      html.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    } else {
-      html.setAttribute('data-theme', t);
-    }
-  }
-  themeSelect.addEventListener('change', () => {
-    const val = themeSelect.value;
-    localStorage.setItem('theme', val);
-    applyTheme(val);
-  });
-
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e=>{
-    if(themeSelect.value==='system'){
-      applyTheme('system');
-    }
-  });
-
-  (() => {
-    const savedTheme = localStorage.getItem('theme') || 'system';
-    themeSelect.value = savedTheme;
-    applyTheme(savedTheme);
-    brightnessRange.value = 100;
-    volumeRange.value = 50;
-    bgm.volume = 0.5;
-    bgm.play();
-    resetGame();
-  })();
-</script>
-</body>
-</html>
+(() => {
+  const board = document.getElementById('board
