@@ -1,6 +1,6 @@
 {
   "name": "マルバツゲーム",
-  "short_name": "マルバツ",
+  "short_name": "◯✕",
   "start_url": "https://game-rho-mocha.vercel.app/",
   "display": "standalone",
   "background_color": "#1f1f1f",
