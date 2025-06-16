@@ -5,291 +5,288 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>マルバツゲーム</title>
 <style>
-:root[data-theme="light"] {
-  --bg:#fff;
-  --text:#000;
-  --btn:#eee;
-  --btn-hover:#ddd;
-}
-:root[data-theme="dark"] {
-  --bg:#222;
-  --text:#eee;
-  --btn:#444;
-  --btn-hover:#555;
-}
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
-  margin:20px;
-  transition: background-color .5s,color .5s;
-  filter: brightness(100%);
-  user-select:none;
-}
-button {
-  background: var(--btn);
-  border: 1px solid #999;
-  color: var(--text);
-  padding: 8px 16px;
-  margin: 5px;
-  cursor: pointer;
-  transition: background-color .3s;
-  font-size: 1rem;
-  border-radius: 4px;
-}
-button:hover {
-  background: var(--btn-hover);
-}
-#board {
-  display: grid;
-  grid-template-columns: repeat(3,80px);
-  grid-template-rows: repeat(3,80px);
-  gap: 5px;
-  margin: 20px auto;
-  max-width: 260px;
-  user-select:none;
-}
-.cell {
-  background: var(--btn);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: background-color .3s;
-  user-select:none;
-}
-.cell:hover {
-  background: var(--btn-hover);
-}
-.win-line {
-  animation: glow 1.5s ease-in-out infinite;
-  border: 3px solid gold;
-  box-shadow: 0 0 15px 3px gold;
-  border-radius: 8px;
-}
-@keyframes glow {
-  0%,100% { box-shadow: 0 0 10px gold; }
-  50% { box-shadow: 0 0 25px gold; }
-}
-#status {
-  font-size: 1.2rem;
-  margin-top: 10px;
-  min-height: 1.5em;
-  user-select:none;
-}
-#settings {
-  border: 1px solid #999;
-  padding: 15px;
-  max-width: 300px;
-  margin: 20px auto;
-  border-radius: 8px;
-  background: var(--btn);
-  user-select:none;
-}
-#settings label {
-  display: block;
-  margin-bottom: 12px;
-  font-weight: 600;
-  user-select:none;
-}
-#settings input[type="range"] {
-  width: 100%;
-}
-#settings select {
-  width: 100%;
-  padding: 6px;
-  font-size: 1rem;
-  border-radius: 4px;
-  border: 1px solid #888;
-  background: var(--bg);
-  color: var(--text);
-}
-#winStreakDisplay {
-  margin-top: 15px;
-  font-weight: 700;
-  font-size: 1.1rem;
-  text-align: center;
-  user-select:none;
-}
+  :root[data-theme="light"] {
+    --bg: #fff;
+    --text: #000;
+    --btn-bg: #eee;
+    --btn-hover-bg: #ddd;
+  }
+  :root[data-theme="dark"] {
+    --bg: #222;
+    --text: #eee;
+    --btn-bg: #444;
+    --btn-hover-bg: #555;
+  }
+  :root {
+    --bg: #fff;
+    --text: #000;
+    --btn-bg: #eee;
+    --btn-hover-bg: #ddd;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.5s, color 0.5s;
+    filter: brightness(100%);
+    user-select: none;
+    height: 100vh;
+    overflow-x: hidden;
+  }
+  #menuToggle {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 30px;
+    height: 22px;
+    cursor: pointer;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  #menuToggle span {
+    display: block;
+    height: 4px;
+    background-color: var(--text);
+    border-radius: 2px;
+    transition: 0.3s;
+  }
+  #menuToggle.open span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  #menuToggle.open span:nth-child(2) {
+    opacity: 0;
+  }
+  #menuToggle.open span:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+  }
+  #settingsPanel {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 300px;
+    height: 100vh;
+    background-color: var(--btn-bg);
+    box-shadow: -2px 0 8px rgba(0,0,0,0.3);
+    padding: 20px;
+    transition: right 0.4s ease;
+    z-index: 10000;
+    color: var(--text);
+    overflow-y: auto;
+  }
+  #settingsPanel.open {
+    right: 0;
+  }
+  #settingsPanel h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+  #settingsPanel label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  #settingsPanel input[type="range"],
+  #settingsPanel select {
+    width: 100%;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #888;
+    font-size: 1rem;
+    background-color: var(--bg);
+    color: var(--text);
+  }
+  #settingsPanel button {
+    background-color: var(--btn-bg);
+    border: 1px solid #999;
+    color: var(--text);
+    padding: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+  }
+  #settingsPanel button:hover {
+    background-color: var(--btn-hover-bg);
+  }
+  #game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  #board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 10px;
+  }
+  .cell {
+    background-color: var(--btn-bg);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  .cell:hover {
+    background-color: var(--btn-hover-bg);
+  }
+  #status {
+    margin-top: 20px;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
 </style>
 </head>
 <body>
-<h1>マルバツゲーム</h1>
-<div id="board">
-  <div class="cell" data-index="0"></div>
-  <div class="cell" data-index="1"></div>
-  <div class="cell" data-index="2"></div>
-  <div class="cell" data-index="3"></div>
-  <div class="cell" data-index="4"></div>
-  <div class="cell" data-index="5"></div>
-  <div class="cell" data-index="6"></div>
-  <div class="cell" data-index="7"></div>
-  <div class="cell" data-index="8"></div>
+<div id="menuToggle" aria-label="設定メニュー開閉" role="button" tabindex="0">
+  <span></span><span></span><span></span>
 </div>
-<div id="status">Xの番です</div>
-<button id="resetBtn">リセット</button>
-<div id="winStreakDisplay">連勝記録: 0</div>
-<div id="settings">
-  <h3>設定</h3>
-  <label>明るさ:
-    <input type="range" id="brightness" min="50" max="150" value="100" />
-  </label>
-  <label>音量:
-    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" />
-  </label>
-  <label>テーマ:
-    <select id="themeSelect">
-      <option value="light">ライト</option>
-      <option value="dark">ダーク</option>
-      <option value="system" selected>システム</option>
-    </select>
-  </label>
-  <button id="toggleBgm">BGM 再生</button>
+<div id="settingsPanel" aria-hidden="true">
+  <h2>設定</h2>
+  <label for="brightnessRange">明るさ</label>
+  <input id="brightnessRange" type="range" min="50" max="150" value="100" />
+  <label for="volumeRange">音量</label>
+  <input id="volumeRange" type="range" min="0" max="100" value="50" />
+  <label for="themeSelect">テーマ</label>
+  <select id="themeSelect">
+    <option value="system">システム</option>
+    <option value="light">ライト</option>
+    <option value="dark">ダーク</option>
+  </select>
 </div>
-<audio id="bgm" loop preload="auto" src="https://cdn.jsdelivr.net/gh/jackzhenguo/music@master/tetris.mp3"></audio>
+<div id="game">
+  <div id="board" aria-label="ゲーム盤" role="grid">
+    <div class="cell" role="gridcell" data-index="0"></div>
+    <div class="cell" role="gridcell" data-index="1"></div>
+    <div class="cell" role="gridcell" data-index="2"></div>
+    <div class="cell" role="gridcell" data-index="3"></div>
+    <div class="cell" role="gridcell" data-index="4"></div>
+    <div class="cell" role="gridcell" data-index="5"></div>
+    <div class="cell" role="gridcell" data-index="6"></div>
+    <div class="cell" role="gridcell" data-index="7"></div>
+    <div class="cell" role="gridcell" data-index="8"></div>
+  </div>
+  <div id="status" aria-live="polite"></div>
+</div>
+<audio id="bgm" loop src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_3d73542c10.mp3?filename=8-bit-background-music-2631.mp3"></audio>
 <script>
-(() => {
-  const board = document.getElementById("board");
-  const cells = board.querySelectorAll(".cell");
-  const status = document.getElementById("status");
-  const resetBtn = document.getElementById("resetBtn");
-  const winStreakDisplay = document.getElementById("winStreakDisplay");
+  const html = document.documentElement;
+  const menuToggle = document.getElementById('menuToggle');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const brightnessRange = document.getElementById('brightnessRange');
+  const volumeRange = document.getElementById('volumeRange');
+  const themeSelect = document.getElementById('themeSelect');
+  const bgm = document.getElementById('bgm');
+  const cells = document.querySelectorAll('.cell');
+  const status = document.getElementById('status');
 
-  let turn = "X";
-  let boardState = Array(9).fill(null);
+  let board = Array(9).fill(null);
+  let turn = 'X';
   let gameOver = false;
 
-  let winStreak = parseInt(localStorage.getItem("winStreak")||"0");
-  updateWinStreakDisplay();
-
-  function updateWinStreakDisplay() {
-    winStreakDisplay.textContent = `連勝記録: ${winStreak}`;
+  function checkWin(player) {
+    const lines = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+    return lines.some(line => line.every(i => board[i] === player));
   }
-
-  const winPatterns = [
-    [0,1,2],[3,4,5],[6,7,8],
-    [0,3,6],[1,4,7],[2,5,8],
-    [0,4,8],[2,4,6]
-  ];
-
-  function checkWin(player){
-    return winPatterns.find(p=>p.every(i=>boardState[i]===player));
+  function checkDraw() {
+    return board.every(cell => cell !== null);
   }
-  function checkDraw(){
-    return boardState.every(c=>c!==null);
-  }
-  function handleClick(e){
-    if(gameOver)return;
-    const idx=+e.target.dataset.index;
-    if(boardState[idx]!==null)return;
-
-    boardState[idx]=turn;
-    e.target.textContent=turn;
-
-    const winLine=checkWin(turn);
-    if(winLine){
-      gameOver=true;
-      status.textContent = `${turn} の勝利！`;
-      winLine.forEach(i=>cells[i].classList.add("win-line"));
-      onWin();
-      return;
+  function updateStatus() {
+    if(gameOver){
+      if(checkWin('X')) status.textContent = "Xの勝利！";
+      else if(checkWin('O')) status.textContent = "Oの勝利！";
+      else status.textContent = "引き分け";
+    } else {
+      status.textContent = turn + "の番";
     }
-    if(checkDraw()){
-      gameOver=true;
-      status.textContent=`引き分け！`;
-      onLose();
-      return;
-    }
-    turn = turn==="X"?"O":"X";
-    status.textContent = `${turn} の番です`;
   }
-  function clearBoard(){
-    boardState.fill(null);
-    cells.forEach(c=>{
-      c.textContent="";
-      c.classList.remove("win-line");
+  function resetGame(){
+    board.fill(null);
+    cells.forEach(c => c.textContent = '');
+    turn = 'X';
+    gameOver = false;
+    updateStatus();
+  }
+  function playMove(i){
+    if(gameOver||board[i]!==null)return;
+    board[i] = turn;
+    cells[i].textContent = turn;
+    if(checkWin(turn)){
+      gameOver = true;
+    } else if(checkDraw()){
+      gameOver = true;
+    } else {
+      turn = turn === 'X' ? 'O' : 'X';
+    }
+    updateStatus();
+  }
+  cells.forEach(c=>{
+    c.addEventListener('click', () => {
+      playMove(Number(c.dataset.index));
     });
-    gameOver=false;
-    turn="X";
-    status.textContent = `${turn} の番です`;
-  }
-  resetBtn.addEventListener("click",clearBoard);
-  cells.forEach(c=>c.addEventListener("click",handleClick));
-
-  function onWin(){
-    winStreak++;
-    localStorage.setItem("winStreak",winStreak);
-    updateWinStreakDisplay();
-    playVictoryEffect();
-  }
-  function onLose(){
-    winStreak=0;
-    localStorage.setItem("winStreak",winStreak);
-    updateWinStreakDisplay();
-  }
-  function playVictoryEffect(){
-    const flash=document.createElement("div");
-    flash.style.position="fixed";
-    flash.style.top=0;
-    flash.style.left=0;
-    flash.style.width="100vw";
-    flash.style.height="100vh";
-    flash.style.backgroundColor="gold";
-    flash.style.opacity="0.6";
-    flash.style.pointerEvents="none";
-    flash.style.zIndex="9999";
-    document.body.appendChild(flash);
-    setTimeout(()=>flash.remove(),300);
-  }
-
-  const bgm=document.getElementById("bgm");
-  const toggleBgmBtn=document.getElementById("toggleBgm");
-  const brightnessInput=document.getElementById("brightness");
-  const volumeInput=document.getElementById("volume");
-  const themeSelect=document.getElementById("themeSelect");
-
-  brightnessInput.value=100;
-  volumeInput.value=0.5;
-  bgm.volume=0.5;
-
-  brightnessInput.addEventListener("input",e=>{
-    document.body.style.filter=`brightness(${e.target.value}%)`;
   });
-  volumeInput.addEventListener("input",e=>{
-    bgm.volume=e.target.value;
+
+  menuToggle.addEventListener('click', () => {
+    const open = settingsPanel.classList.toggle('open');
+    menuToggle.classList.toggle('open', open);
+    settingsPanel.setAttribute('aria-hidden', !open);
   });
-  themeSelect.addEventListener("change",e=>{
-    const val=e.target.value;
-    if(val==="light"){
-      document.documentElement.setAttribute("data-theme","light");
-    }else if(val==="dark"){
-      document.documentElement.setAttribute("data-theme","dark");
-    }else{
-      document.documentElement.removeAttribute("data-theme");
+
+  brightnessRange.addEventListener('input', () => {
+    const val = brightnessRange.value;
+    html.style.filter = `brightness(${val}%)`;
+  });
+
+  volumeRange.addEventListener('input', () => {
+    bgm.volume = volumeRange.value / 100;
+  });
+
+  function applyTheme(t){
+    if(t==='system'){
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    } else {
+      html.setAttribute('data-theme', t);
+    }
+  }
+  themeSelect.addEventListener('change', () => {
+    const val = themeSelect.value;
+    localStorage.setItem('theme', val);
+    applyTheme(val);
+  });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e=>{
+    if(themeSelect.value==='system'){
+      applyTheme('system');
     }
   });
-  let isPlaying=false;
-  toggleBgmBtn.addEventListener("click",()=>{
-    if(isPlaying){
-      bgm.pause();
-      toggleBgmBtn.textContent="BGM 再生";
-    }else{
-      bgm.play();
-      toggleBgmBtn.textContent="BGM 停止";
-    }
-    isPlaying=!isPlaying;
-  });
-  document.body.addEventListener("click",()=>{
-    if(!isPlaying){
-      bgm.play().catch(()=>{});
-      toggleBgmBtn.textContent="BGM 停止";
-      isPlaying=true;
-    }
-  },{once:true});
-})();
+
+  (() => {
+    const savedTheme = localStorage.getItem('theme') || 'system';
+    themeSelect.value = savedTheme;
+    applyTheme(savedTheme);
+    brightnessRange.value = 100;
+    volumeRange.value = 50;
+    bgm.volume = 0.5;
+    bgm.play();
+    resetGame();
+  })();
 </script>
 </body>
 </html>
