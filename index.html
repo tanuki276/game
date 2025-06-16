@@ -1,97 +1,138 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html><html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>三目並べ改</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>マルバツゲーム</title>
   <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      transition: background 0.3s, color 0.3s;
-    }
     :root {
-      --bg: #ffffff;
-      --fg: #000000;
-      --grid-border: #000000;
-    }
-    .dark {
-      --bg: #111111;
-      --fg: #eeeeee;
-      --grid-border: #eeeeee;
-    }
-    #game {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-gap: 4px;
-      justify-content: center;
-      margin-top: 50px;
-    }
-    .cell {
-      width: 100px;
-      height: 100px;
-      background: transparent;
-      border: 2px solid var(--grid-border);
-      font-size: 64px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      user-select: none;
-    }
-    .cell.x { color: #d32f2f; }
-    .cell.o { color: #1976d2; }
-    #menu-button {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      width: 40px;
-      height: 40px;
-      background: var(--fg);
-      color: var(--bg);
-      font-size: 24px;
-      border: none;
-      border-radius: 4px;
-    }
-    #settings {
-      position: fixed;
-      top: 0;
-      left: 0;
-      background: var(--bg);
-      color: var(--fg);
-      width: 250px;
-      height: 100%;
-      padding: 20px;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-      transform: translateX(-100%);
-      transition: transform 0.3s;
-      z-index: 10;
-    }
-    #settings.show {
-      transform: translateX(0);
-    }
-    label, select, input {
-      display: block;
-      margin-bottom: 10px;
-    }
-    #status {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 1.2em;
-    }
-    #record {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 0.9em;
-    }
+      --dark-bg: #0f0f1a;
+      --dark-tile: #1a1a2e;
+      --dark-accent: #00ffe5;
+      --dark-win: linear-gradient(90deg, #00ffe5, #9c27b0);--light-bg: #ffffff;
+  --light-tile: #f0f0f0;
+  --light-accent: #f5c518;
+  --light-win: linear-gradient(90deg, #f5c518, #00bfff);
+
+  --tile-size: min(25vw, 25vh);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: sans-serif;
+  background: var(--bg);
+  color: var(--accent);
+  transition: background 0.3s, color 0.3s;
+}
+
+body.dark {
+  --bg: var(--dark-bg);
+  --tile: var(--dark-tile);
+  --accent: var(--dark-accent);
+  --win-gradient: var(--dark-win);
+}
+
+body.light {
+  --bg: var(--light-bg);
+  --tile: var(--light-tile);
+  --accent: var(--light-accent);
+  --win-gradient: var(--light-win);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  margin: 60px auto 10px;
+  width: fit-content;
+}
+
+.cell {
+  width: var(--tile-size);
+  height: var(--tile-size);
+  background: var(--tile);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6vmin;
+  border-radius: 15px;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.cell.winner {
+  background: var(--win-gradient);
+  color: white;
+  transform: scale(1.1);
+}
+
+.status {
+  text-align: center;
+  font-size: 1.4em;
+  margin-top: 10px;
+}
+
+.menu-toggle {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: var(--tile);
+  color: var(--accent);
+  font-size: 1.4em;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  z-index: 1001;
+}
+
+.settings {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 250px;
+  height: 100%;
+  background: var(--tile);
+  padding: 20px;
+  transition: left 0.3s;
+  z-index: 1000;
+}
+
+.settings.open {
+  left: 0;
+}
+
+.settings h2 {
+  margin-bottom: 10px;
+}
+
+.settings label {
+  display: block;
+  margin: 10px 0;
+}
+
+button, select {
+  font-size: 1em;
+  padding: 5px;
+  margin-top: 5px;
+}
+
+.hidden {
+  display: none;
+}
+
   </style>
 </head>
-<body>
-  <button id="menu-button">☰</button>
-  <div id="settings">
+<body class="dark">
+  <button class="menu-toggle">☰</button>
+  <div class="settings" id="settingsPanel">
+    <h2>設定</h2>
     <label>テーマ
       <select id="theme">
         <option value="system">システム</option>
@@ -99,183 +140,169 @@
         <option value="dark">ダーク</option>
       </select>
     </label>
-    <label>明るさ
-      <input type="range" id="brightness" min="50" max="150" value="100">
-    </label>
     <label>音量
-      <input type="range" id="volume" min="0" max="100" value="50">
+      <input type="range" id="volume" min="0" max="1" step="0.01" />
     </label>
     <label>強さ
       <select id="difficulty">
-        <option value="0">よわい</option>
+        <option value="random">よわい</option>
         <option value="3">ふつう</option>
         <option value="9">つよい</option>
       </select>
     </label>
     <button onclick="resetGame()">リセット</button>
+    <button onclick="resetWins()">記録リセット</button>
   </div>
-  <div id="game"></div>
-  <div id="status"></div>
-  <div id="record"></div>
-  <audio id="bgm" loop>
-    <source src="https://vgmsite.com/soundtracks/tetris-gameboy/jtazkvmn/01%20Type%20A.mp3" type="audio/mp3">
-  </audio>
+  <div class="board" id="board"></div>
+  <div class="status" id="status"></div>
+  <audio id="bgm" src="https://files.catbox.moe/z4ptfq.mp3" loop></audio>  <script>
+    const board = document.getElementById('board');
+    const status = document.getElementById('status');
+    const themeSelect = document.getElementById('theme');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const menuToggle = document.querySelector('.menu-toggle');
+    const bgm = document.getElementById('bgm');
+    const volume = document.getElementById('volume');
+    const difficulty = document.getElementById('difficulty');
 
-  <script>
-    const cells = [];
-    let board = Array(9).fill("");
-    let player = "x";
-    let ai = "o";
+    let cells = Array(9).fill('');
+    let current = 'X';
     let playing = true;
-    let winStreak = parseInt(localStorage.getItem("winStreak") || "0");
-    const game = document.getElementById("game");
-    const status = document.getElementById("status");
-    const record = document.getElementById("record");
-    const bgm = document.getElementById("bgm");
+    let winStreak = parseInt(localStorage.getItem('wins')) || 0;
 
-    const themeSelect = document.getElementById("theme");
-    const brightnessSlider = document.getElementById("brightness");
-    const volumeSlider = document.getElementById("volume");
-    const diffSelect = document.getElementById("difficulty");
-
-    function createBoard() {
-      game.innerHTML = "";
-      for (let i = 0; i < 9; i++) {
-        const div = document.createElement("div");
-        div.className = "cell";
-        div.addEventListener("click", () => playerMove(i));
-        game.appendChild(div);
-        cells[i] = div;
-      }
+    function draw() {
+      board.innerHTML = '';
+      cells.forEach((v, i) => {
+        const div = document.createElement('div');
+        div.className = 'cell';
+        div.textContent = v;
+        div.onclick = () => move(i);
+        board.appendChild(div);
+      });
     }
 
-    function updateCell(i) {
-      cells[i].textContent = board[i] === "x" ? "✕" : board[i] === "o" ? "◯" : "";
-      cells[i].classList.toggle("x", board[i] === "x");
-      cells[i].classList.toggle("o", board[i] === "o");
+    function move(i) {
+      if (!playing || cells[i]) return;
+      cells[i] = current;
+      draw();
+      const win = checkWin();
+      if (win) return showWin(win);
+      current = current === 'X' ? 'O' : 'X';
+      if (current === 'O') botMove();
     }
 
-    function checkWin(b, p) {
-      const lines = [
+    function botMove() {
+      setTimeout(() => {
+        let idx;
+        const empty = cells.map((v, i) => v ? -1 : i).filter(v => v !== -1);
+        if (difficulty.value === 'random') {
+          idx = empty[Math.floor(Math.random() * empty.length)];
+        } else {
+          idx = findBestMove(current, parseInt(difficulty.value));
+        }
+        if (idx !== undefined) move(idx);
+      }, 300);
+    }
+
+    function checkWin() {
+      const w = [
         [0,1,2],[3,4,5],[6,7,8],
         [0,3,6],[1,4,7],[2,5,8],
         [0,4,8],[2,4,6]
       ];
-      return lines.some(line => line.every(i => b[i] === p));
+      for (let [a,b,c] of w) {
+        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return [a,b,c];
+      }
+      if (!cells.includes('')) {
+        playing = false;
+        status.textContent = '引き分け';
+      }
     }
 
-    function emptyCells(b) {
-      return b.map((v,i)=>v===""?i:null).filter(v=>v!==null);
-    }
-
-    function botMove() {
-      const level = parseInt(diffSelect.value);
-      let best = null;
-      let bestScore = -Infinity;
-      emptyCells(board).forEach(i => {
-        board[i] = ai;
-        let score = minimax(board, 0, false, level);
-        board[i] = "";
-        if (score > bestScore) {
-          bestScore = score;
-          best = i;
-        }
+    function showWin(win) {
+      playing = false;
+      document.querySelectorAll('.cell').forEach((c, i) => {
+        if (win.includes(i)) c.classList.add('winner');
       });
-      if (best !== null) {
-        board[best] = ai;
-        updateCell(best);
-        if (checkWin(board, ai)) {
-          status.textContent = "負けた！";
-          playing = false;
-          winStreak = 0;
-          localStorage.setItem("winStreak", "0");
-        } else if (emptyCells(board).length === 0) {
-          status.textContent = "引き分け！";
-          playing = false;
-        }
-      }
-    }
-
-    function minimax(b, depth, isMax, maxDepth) {
-      if (checkWin(b, ai)) return 10 - depth;
-      if (checkWin(b, player)) return depth - 10;
-      if (emptyCells(b).length === 0 || depth >= maxDepth) return 0;
-      if (isMax) {
-        let best = -Infinity;
-        for (let i of emptyCells(b)) {
-          b[i] = ai;
-          best = Math.max(best, minimax(b, depth + 1, false, maxDepth));
-          b[i] = "";
-        }
-        return best;
-      } else {
-        let best = Infinity;
-        for (let i of emptyCells(b)) {
-          b[i] = player;
-          best = Math.min(best, minimax(b, depth + 1, true, maxDepth));
-          b[i] = "";
-        }
-        return best;
-      }
-    }
-
-    function playerMove(i) {
-      if (!playing || board[i]) return;
-      board[i] = player;
-      updateCell(i);
-      if (checkWin(board, player)) {
-        status.textContent = "勝ち！";
+      if (current === 'X') {
         winStreak++;
-        localStorage.setItem("winStreak", winStreak.toString());
-        playing = false;
-        return;
-      } else if (emptyCells(board).length === 0) {
-        status.textContent = "引き分け！";
-        playing = false;
-        return;
+        localStorage.setItem('wins', winStreak);
+        status.textContent = `勝利！連勝：${winStreak}`;
+      } else {
+        winStreak = 0;
+        localStorage.setItem('wins', winStreak);
+        status.textContent = '負けた…';
       }
-      setTimeout(() => botMove(), 300);
     }
 
     function resetGame() {
-      board = Array(9).fill("");
+      cells = Array(9).fill('');
+      current = 'X';
       playing = true;
-      status.textContent = "";
-      createBoard();
+      status.textContent = '';
+      draw();
     }
 
-    document.getElementById("menu-button").addEventListener("click", () => {
-      document.getElementById("settings").classList.toggle("show");
-    });
+    function resetWins() {
+      winStreak = 0;
+      localStorage.setItem('wins', 0);
+      status.textContent = '記録リセット';
+    }
 
-    themeSelect.addEventListener("change", applyTheme);
-    brightnessSlider.addEventListener("input", () => {
-      document.body.style.filter = `brightness(${brightnessSlider.value}%)`;
-    });
-    volumeSlider.addEventListener("input", () => {
-      bgm.volume = volumeSlider.value / 100;
-    });
+    function findBestMove(player, depth) {
+      const opponent = player === 'X' ? 'O' : 'X';
+      let bestScore = -Infinity;
+      let move;
+      cells.forEach((v, i) => {
+        if (!v) {
+          cells[i] = player;
+          let score = minimax(cells, 0, false, player, opponent, depth);
+          cells[i] = '';
+          if (score > bestScore) {
+            bestScore = score;
+            move = i;
+          }
+        }
+      });
+      return move;
+    }
 
-    function applyTheme() {
-      const theme = themeSelect.value;
-      if (theme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else if (theme === "light") {
-        document.documentElement.classList.remove("dark");
-      } else {
-        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.classList.toggle("dark", isDark);
+    function minimax(board, d, isMax, player, opponent, maxDepth) {
+      const w = checkWin();
+      if (w && current === player) return 10 - d;
+      if (w && current === opponent) return d - 10;
+      if (!board.includes('') || d >= maxDepth) return 0;
+
+      let scores = [];
+      board.forEach((v, i) => {
+        if (!v) {
+          board[i] = isMax ? player : opponent;
+          scores.push(minimax(board, d + 1, !isMax, player, opponent, maxDepth));
+          board[i] = '';
+        }
+      });
+      return isMax ? Math.max(...scores) : Math.min(...scores);
+    }
+
+    function applyTheme(t) {
+      const theme = t || themeSelect.value;
+      const body = document.body;
+      body.classList.remove('dark', 'light');
+      if (theme === 'dark') body.classList.add('dark');
+      else if (theme === 'light') body.classList.add('light');
+      else {
+        const sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        body.classList.add(sys ? 'dark' : 'light');
       }
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      createBoard();
-      applyTheme();
-      document.body.style.filter = `brightness(${brightnessSlider.value}%)`;
-      bgm.volume = volumeSlider.value / 100;
-      bgm.play().catch(() => {});
-      record.textContent = `連勝: ${winStreak}`;
-    });
-  </script>
-</body>
+    themeSelect.onchange = () => applyTheme();
+    volume.oninput = () => bgm.volume = volume.value;
+    menuToggle.onclick = () => settingsPanel.classList.toggle('open');
+
+    draw();
+    applyTheme();
+    bgm.volume = 0.3;
+    bgm.play();
+  </script></body>
 </html>
