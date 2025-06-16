@@ -6,195 +6,195 @@
 <title>マルバツゲーム</title>
 <style>
   :root {
-    --bg-light: #fff;
+    --bg-light: #fefefe;
     --bg-dark: #222;
-    --fg-light: #222;
-    --fg-dark: #eee;
-    --accent: #f90;
-  }
-  html[data-theme='light'] {
-    background: var(--bg-light);
-    color: var(--fg-light);
-  }
-  html[data-theme='dark'] {
-    background: var(--bg-dark);
-    color: var(--fg-dark);
+    --text-light: #222;
+    --text-dark: #eee;
+    --border-light: #aaa;
+    --border-dark: #555;
+    --primary-light: #0080ff;
+    --primary-dark: #3399ff;
   }
   body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0; padding: 0;
-    display: flex; flex-direction: column;
-    align-items: center; min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    user-select: none;
   }
-  h1 {
-    margin: 1rem 0;
+  body.dark {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
   }
   #game {
     display: grid;
     grid-template-columns: repeat(3, 80px);
     grid-template-rows: repeat(3, 80px);
-    gap: 6px;
-    margin-bottom: 1rem;
+    gap: 8px;
+    margin: 20px 0;
   }
   .cell {
-    background: #ccc;
-    border: 2px solid #999;
+    background-color: var(--bg-light);
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
     font-size: 48px;
-    font-weight: bold;
-    text-align: center;
-    line-height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
-    user-select: none;
-    border-radius: 6px;
     transition: background-color 0.3s, border-color 0.3s;
   }
-  html[data-theme='light'] .cell {
-    background: #eee;
-    border-color: #bbb;
+  body.dark .cell {
+    background-color: var(--bg-dark);
+    border-color: var(--border-dark);
   }
-  html[data-theme='dark'] .cell {
-    background: #333;
-    border-color: #666;
-    color: var(--fg-dark);
-  }
-  .cell.disabled {
+  .cell:disabled {
     cursor: default;
-    opacity: 0.6;
+    opacity: 0.7;
   }
   #status {
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
+    font-size: 1.2em;
+    margin-bottom: 10px;
   }
   #streak {
-    margin-bottom: 1rem;
-    font-weight: bold;
+    font-size: 1em;
+    margin-bottom: 10px;
   }
-  #resetBtn {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    border-radius: 4px;
-    border: none;
-    background: var(--accent);
-    color: #fff;
-    transition: background-color 0.3s;
-  }
-  #resetBtn:hover {
-    background: #e67e00;
-  }
-  #menuToggle {
+  #settingsBtn {
     position: fixed;
     top: 16px;
     right: 16px;
-    width: 32px;
-    height: 32px;
+    background: none;
+    border: none;
+    font-size: 28px;
     cursor: pointer;
+    color: inherit;
     z-index: 100;
-  }
-  #menuToggle div {
-    background: var(--accent);
-    height: 4px;
-    margin: 6px 0;
-    border-radius: 2px;
-    transition: 0.3s;
-  }
-  #menuCheckbox {
-    display: none;
   }
   #settingsPanel {
     position: fixed;
-    top: 56px;
-    right: 16px;
-    background: var(--bg-light);
-    border: 2px solid var(--accent);
-    border-radius: 8px;
-    padding: 1rem;
-    width: 200px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    display: none;
-    z-index: 99;
+    top: 0;
+    right: -300px;
+    width: 280px;
+    height: 100vh;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    box-shadow: -2px 0 6px rgba(0,0,0,0.3);
+    padding: 20px;
+    box-sizing: border-box;
+    transition: right 0.3s;
+    display: flex;
+    flex-direction: column;
   }
-  html[data-theme='dark'] #settingsPanel {
-    background: var(--bg-dark);
-    border-color: var(--accent);
-    color: var(--fg-dark);
+  body.dark #settingsPanel {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
   }
-  #menuCheckbox:checked + #menuToggle + #settingsPanel {
-    display: block;
+  #settingsPanel.open {
+    right: 0;
   }
   #settingsPanel label {
-    display: block;
-    margin: 0.5rem 0 0.25rem;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-weight: bold;
   }
-  #settingsPanel select,
-  #settingsPanel input[type=range] {
+  #settingsPanel select, #settingsPanel input[type=range] {
     width: 100%;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+    background-color: var(--bg-light);
+    color: var(--text-light);
+  }
+  body.dark #settingsPanel select, body.dark #settingsPanel input[type=range] {
+    background-color: var(--bg-dark);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+  }
+  #resetStreakBtn {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: var(--primary-light);
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  #resetStreakBtn:hover {
+    background-color: var(--primary-dark);
+  }
+  #themeSelect {
+    width: 100%;
+  }
+  #bgmControl {
+    margin-top: 12px;
   }
 </style>
 </head>
 <body>
-<h1>マルバツゲーム</h1>
-<div id="status" role="status" aria-live="polite">あなたの番です。</div>
-<div id="streak">連勝記録: 0 連勝</div>
-<div id="game" role="grid" aria-label="三目並べ盤面">
-  <div class="cell" role="gridcell" tabindex="0" data-index="0" aria-label="セル 1"></div>
-  <div class="cell" role="gridcell" tabindex="0" data-index="1" aria-label="セル 2"></div>
-  <div class="cell" role="gridcell" tabindex="0" data-index="2" aria-label="セル 3"></div>
-  <div class="cell" role="gridcell" tabindex="0" data-index="3" aria-label="セル 4"></div>
-  <div class="cell" role="gridcell" tabindex="0" data-index="4" aria-label="セル 5"></div>
-  <div class="cell" role="gridcell" tabindex="0" data-index="5" aria-label="セル 6"></div>
-  <div class="cell" role="gridcell" tabindex="0" data-index="6" aria-label="セル 7"></div>
-  <div class="cell" role="gridcell" tabindex="0" data-index="7" aria-label="セル 8"></div>
-  <div class="cell" role="gridcell" tabindex="0" data-index="8" aria-label="セル 9"></div>
-</div>
-<button id="resetBtn" aria-label="ゲームをリセット">リセット</button>
-
-<input type="checkbox" id="menuCheckbox" aria-haspopup="true" aria-controls="settingsPanel" aria-expanded="false" />
-<label for="menuCheckbox" id="menuToggle" aria-label="設定メニューを開く">
-  <div></div>
-  <div></div>
-  <div></div>
-</label>
-<section id="settingsPanel" role="region" aria-labelledby="settingsLabel" tabindex="-1">
-  <h2 id="settingsLabel">設定</h2>
+<button id="settingsBtn" aria-label="設定メニュー">&#9776;</button>
+<div id="settingsPanel" aria-hidden="true" role="region" aria-label="設定">
   <label for="brightnessRange">明るさ</label>
-  <input type="range" id="brightnessRange" min="50" max="150" value="100" />
+  <input type="range" id="brightnessRange" min="50" max="150" value="100" aria-valuemin="50" aria-valuemax="150" aria-valuenow="100" />
   <label for="volumeRange">音量</label>
-  <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="0.5" />
+  <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="0.5" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.5" />
   <label for="themeSelect">テーマ</label>
   <select id="themeSelect" aria-label="テーマ選択">
-    <option value="system">システム</option>
     <option value="light">ライト</option>
     <option value="dark">ダーク</option>
+    <option value="system">システム</option>
   </select>
-  <button id="resetStreakBtn" style="margin-top:1rem;">連勝記録をリセット</button>
-</section>
-
-<audio id="bgm" loop preload="auto" src="https://cdn.jsdelivr.net/gh/kumajoi/tetris-theme-loop@latest/tetris-theme-loop.mp3"></audio>
-
+  <label for="difficultySelect">強さ</label>
+  <select id="difficultySelect" aria-label="強さ選択">
+    <option value="1">よわい（ランダム）</option>
+    <option value="3" selected>ふつう</option>
+    <option value="9">つよい（不可能に近い）</option>
+  </select>
+  <button id="resetStreakBtn">連勝記録リセット</button>
+</div>
+<div id="status" role="status" aria-live="polite">あなたの番です。</div>
+<div id="streak">連勝記録: 0</div>
+<div id="game" role="grid" aria-label="三目並びゲーム盤">
+  <button class="cell" role="gridcell" aria-label="空きマス" data-index="0"></button>
+  <button class="cell" role="gridcell" aria-label="空きマス" data-index="1"></button>
+  <button class="cell" role="gridcell" aria-label="空きマス" data-index="2"></button>
+  <button class="cell" role="gridcell" aria-label="空きマス" data-index="3"></button>
+  <button class="cell" role="gridcell" aria-label="空きマス" data-index="4"></button>
+  <button class="cell" role="gridcell" aria-label="空きマス" data-index="5"></button>
+  <button class="cell" role="gridcell" aria-label="空きマス" data-index="6"></button>
+  <button class="cell" role="gridcell" aria-label="空きマス" data-index="7"></button>
+  <button class="cell" role="gridcell" aria-label="空きマス" data-index="8"></button>
+</div>
+<audio id="bgm" loop src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5bb876765d.mp3?filename=retro-game-arcade-loop-11099.mp3" preload="auto"></audio>
 <script>
-(() => {
-  const cells = [...document.querySelectorAll('.cell')];
+  const game = document.getElementById('game');
+  const cells = [...game.querySelectorAll('.cell')];
   const status = document.getElementById('status');
   const streakDisplay = document.getElementById('streak');
-  const resetGameBtn = document.getElementById('resetBtn');
-  const resetStreakBtn = document.getElementById('resetStreakBtn');
-  const menuCheckbox = document.getElementById('menuCheckbox');
+  const settingsBtn = document.getElementById('settingsBtn');
   const settingsPanel = document.getElementById('settingsPanel');
   const brightnessRange = document.getElementById('brightnessRange');
   const volumeRange = document.getElementById('volumeRange');
   const themeSelect = document.getElementById('themeSelect');
+  const difficultySelect = document.getElementById('difficultySelect');
+  const resetStreakBtn = document.getElementById('resetStreakBtn');
   const bgm = document.getElementById('bgm');
-
   let boardState = Array(9).fill(null);
   let currentPlayer = 'X';
   let gameActive = true;
-  let streakCount = Number(localStorage.getItem('tictactoe_streak')) || 0;
-
-  updateStreak();
+  let streakCount = 0;
 
   function updateCell(index) {
-    cells[index].textContent = boardState[index] || '';
+    const cell = cells[index];
+    cell.textContent = boardState[index] === 'X' ? '✕' : boardState[index] === 'O' ? '◯' : '';
+    cell.setAttribute('aria-label', boardState[index] ? (boardState[index] === 'X' ? '✕マス' : '◯マス') : '空きマス');
+    cell.disabled = !!boardState[index] || !gameActive;
   }
 
   function checkWin(player) {
@@ -203,42 +203,121 @@
       [0,3,6],[1,4,7],[2,5,8],
       [0,4,8],[2,4,6]
     ];
-    return wins.some(line =>
-      line.every(index => boardState[index] === player)
-    );
+    return wins.some(line => line.every(i => boardState[i] === player));
   }
 
   function disableAllCells() {
-    cells.forEach(cell => {
-      cell.classList.add('disabled');
-      cell.setAttribute('aria-disabled', 'true');
-      cell.tabIndex = -1;
-    });
+    cells.forEach(c => c.disabled = true);
   }
 
-  function enableAllCells() {
-    cells.forEach(cell => {
-      cell.classList.remove('disabled');
-      cell.removeAttribute('aria-disabled');
-      cell.tabIndex = 0;
+  function enableEmptyCells() {
+    cells.forEach((c,i) => {
+      c.disabled = boardState[i] !== null || !gameActive;
     });
-  }
-
-  function updateStreak() {
-    streakDisplay.textContent = `連勝記録: ${streakCount} 連勝`;
   }
 
   function saveStreak() {
-    localStorage.setItem('tictactoe_streak', streakCount);
+    localStorage.setItem('ticTacToeStreak', streakCount);
+  }
+
+  function loadStreak() {
+    const saved = localStorage.getItem('ticTacToeStreak');
+    streakCount = saved ? Number(saved) : 0;
+    updateStreak();
+  }
+
+  function updateStreak() {
+    streakDisplay.textContent = `連勝記録: ${streakCount}`;
+  }
+
+  function resetGame() {
+    boardState.fill(null);
+    gameActive = true;
+    currentPlayer = 'X';
+    status.textContent = 'あなたの番です。';
+    cells.forEach((c,i) => {
+      c.textContent = '';
+      c.disabled = false;
+      c.setAttribute('aria-label', '空きマス');
+    });
+    enableEmptyCells();
+  }
+
+  function minimax(board, depth, isMaximizing) {
+    const winner = getWinner(board);
+    if(winner === 'O') return 10 - depth;
+    if(winner === 'X') return depth - 10;
+    if(board.every(v => v !== null)) return 0;
+    if(depth === 0) return 0;
+
+    if(isMaximizing) {
+      let bestScore = -Infinity;
+      for(let i=0; i<9; i++) {
+        if(board[i] === null) {
+          board[i] = 'O';
+          const score = minimax(board, depth -1, false);
+          board[i] = null;
+          bestScore = Math.max(score, bestScore);
+        }
+      }
+      return bestScore;
+    } else {
+      let bestScore = Infinity;
+      for(let i=0; i<9; i++) {
+        if(board[i] === null) {
+          board[i] = 'X';
+          const score = minimax(board, depth -1, true);
+          board[i] = null;
+          bestScore = Math.min(score, bestScore);
+        }
+      }
+      return bestScore;
+    }
+  }
+
+  function getWinner(board) {
+    const lines = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+    for(const [a,b,c] of lines) {
+      if(board[a] && board[a] === board[b] && board[a] === board[c]) {
+        return board[a];
+      }
+    }
+    return null;
   }
 
   function aiMove() {
-    const emptyIndices = boardState.map((v,i) => v === null ? i : null).filter(i => i !== null);
-    if(emptyIndices.length === 0) return;
-    // 簡単なランダムAI
-    const choice = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-    boardState[choice] = 'O';
-    updateCell(choice);
+    if(!gameActive) return;
+    const depthLimit = Number(difficultySelect.value);
+    if(depthLimit === 1) {
+      const emptyIndices = boardState.map((v,i) => v === null ? i : null).filter(i => i !== null);
+      if(emptyIndices.length === 0) return;
+      const choice = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+      boardState[choice] = 'O';
+      updateCell(choice);
+    } else {
+      let bestScore = -Infinity;
+      let bestMove = null;
+      for(let i=0; i<9; i++) {
+        if(boardState[i] === null) {
+          boardState[i] = 'O';
+          const score = minimax(boardState, depthLimit, false);
+          boardState[i] = null;
+          if(score > bestScore) {
+            bestScore = score;
+            bestMove = i;
+          }
+        }
+      }
+      if(bestMove !== null) {
+        boardState[bestMove] = 'O';
+        updateCell(bestMove);
+      }
+    }
+
     if(checkWin('O')) {
       gameActive = false;
       status.textContent = 'AIの勝利です。';
@@ -258,17 +337,17 @@
     }
     currentPlayer = 'X';
     status.textContent = 'あなたの番です。';
+    enableEmptyCells();
   }
 
-  function onCellClick(e) {
-    const index = Number(e.target.dataset.index);
+  function playerMove(index) {
     if(!gameActive || boardState[index] !== null) return;
-    boardState[index] = currentPlayer;
+    if(currentPlayer !== 'X') return;
+    boardState[index] = 'X';
     updateCell(index);
-
-    if(checkWin(currentPlayer)) {
+    if(checkWin('X')) {
       gameActive = false;
-      status.textContent = 'あなたの勝利！';
+      status.textContent = 'あなたの勝利です！';
       streakCount++;
       updateStreak();
       saveStreak();
@@ -284,91 +363,63 @@
       return;
     }
     currentPlayer = 'O';
-    status.textContent = 'AIの番です...';
+    status.textContent = 'AIの番です。';
     disableAllCells();
-    setTimeout(() => {
-      aiMove();
-      if(gameActive) enableAllCells();
-    }, 500);
-  }
-
-  function resetGame() {
-    boardState.fill(null);
-    currentPlayer = 'X';
-    gameActive = true;
-    status.textContent = 'あなたの番です。';
-    cells.forEach((cell) => {
-      cell.textContent = '';
-      cell.classList.remove('disabled');
-      cell.removeAttribute('aria-disabled');
-      cell.tabIndex = 0;
-    });
-  }
-
-  function resetStreak() {
-    streakCount = 0;
-    updateStreak();
-    saveStreak();
+    setTimeout(aiMove, 500);
   }
 
   cells.forEach(cell => {
-    cell.addEventListener('click', onCellClick);
-    cell.addEventListener('keydown', e => {
-      if(e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        cell.click();
-      }
+    cell.addEventListener('click', () => {
+      const idx = Number(cell.dataset.index);
+      playerMove(idx);
     });
   });
 
-  resetGameBtn.addEventListener('click', resetGame);
-  resetStreakBtn.addEventListener('click', resetStreak);
+  settingsBtn.addEventListener('click', () => {
+    const open = settingsPanel.classList.toggle('open');
+    settingsPanel.setAttribute('aria-hidden', !open);
+  });
 
-  menuCheckbox.addEventListener('change', e => {
-    const expanded = e.target.checked;
-    e.target.setAttribute('aria-expanded', expanded);
-    if(expanded) {
-      settingsPanel.focus();
+  brightnessRange.addEventListener('input', () => {
+    const val = brightnessRange.value;
+    document.body.style.filter = `brightness(${val}%)`;
+  });
+
+  volumeRange.addEventListener('input', () => {
+    bgm.volume = volumeRange.value;
+  });
+
+  themeSelect.addEventListener('change', () => {
+    const val = themeSelect.value;
+    if(val === 'light') {
+      document.body.classList.remove('dark');
+    } else if(val === 'dark') {
+      document.body.classList.add('dark');
+    } else if(val === 'system') {
+      const darkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if(darkScheme) document.body.classList.add('dark');
+      else document.body.classList.remove('dark');
     }
   });
 
-  brightnessRange.addEventListener('input', e => {
-    const val = e.target.value;
-    document.documentElement.style.filter = `brightness(${val}%)`;
+  resetStreakBtn.addEventListener('click', () => {
+    streakCount = 0;
+    updateStreak();
+    saveStreak();
   });
 
-  volumeRange.addEventListener('input', e => {
-    bgm.volume = e.target.value;
-    if(bgm.volume > 0) {
-      bgm.play().catch(()=>{});
-    } else {
-      bgm.pause();
-    }
-  });
-
-  themeSelect.value = localStorage.getItem('tictactoe_theme') || 'system';
-
-  function applyTheme(value) {
-    if(value === 'system') {
-      document.documentElement.removeAttribute('data-theme');
-    } else {
-      document.documentElement.setAttribute('data-theme', value);
-    }
+  function init() {
+    loadStreak();
+    brightnessRange.value = 100;
+    volumeRange.value = 0.5;
+    bgm.volume = 0.5;
+    themeSelect.value = 'system';
+    themeSelect.dispatchEvent(new Event('change'));
+    bgm.play().catch(() => {});
+    resetGame();
   }
-  applyTheme(themeSelect.value);
 
-  themeSelect.addEventListener('change', e => {
-    const val = e.target.value;
-    localStorage.setItem('tictactoe_theme', val);
-    applyTheme(val);
-  });
-
-  // 初期設定
-  resetGame();
-  bgm.volume = volumeRange.value;
-  if(bgm.volume > 0) bgm.play().catch(()=>{});
-
-})();
+  init();
 </script>
 </body>
 </html>
